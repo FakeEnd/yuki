@@ -16,8 +16,9 @@ BILIBILI_UID = 1515375273
 YOUTUBE_CHANNEL = "https://www.youtube.com/@SavvyCapitalist%E8%81%AA%E6%98%8E%E5%B0%8F%E8%B5%84/videos"
 
 # Configure Bilibili User Agent to avoid 412
-from bilibili_api import settings
-settings.user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+import bilibili_api
+# settings.user_agent is not available in all versions, but HEADERS is a global dict
+bilibili_api.HEADERS["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 
 
 # Helper to load cookies for Cloud Execution
