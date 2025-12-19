@@ -15,6 +15,11 @@ BILIBILI_UID = 1515375273
 # Using /videos to ensure we get chronological uploads
 YOUTUBE_CHANNEL = "https://www.youtube.com/@SavvyCapitalist%E8%81%AA%E6%98%8E%E5%B0%8F%E8%B5%84/videos"
 
+# Configure Bilibili User Agent to avoid 412
+from bilibili_api import settings
+settings.user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+
+
 # Helper to load cookies for Cloud Execution
 def load_cookies():
     cookie_content = os.getenv("COOKIES_TXT")
