@@ -19,13 +19,26 @@ YOUTUBE_CHANNEL = "https://www.youtube.com/@SavvyCapitalist%E8%81%AA%E6%98%8E%E5
 import bilibili_api
 # settings.user_agent is not available in all versions, but HEADERS is a global dict
 bilibili_api.HEADERS["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-
+bilibili_api.HEADERS["Referer"] = "https://www.bilibili.com/"
 
 # Helper to load cookies for Cloud Execution
 def load_cookies():
     cookie_content = os.getenv("COOKIES_TXT")
     if cookie_content:
-        # Create cookies.txt from secret
+        # Ensure correct format for Netscape cookies
+        # GitHub Secrets might mess up newlines or the user might have copied it weirdly.
+        # We ensure it looks like a proper file.
+        
+        # 1. Start with the magic header if missing
+        header = "# Netscape HTTP Cookie File"
+        if not cookie_content.strip().startswith("# Netscape"):
+            cookie_content = header + "\n" + cookie_content
+            
+        # 2. Ensure newlines are preserved (some CIs flatten them)
+        # If the content looks like one giant line but contains domain names, we might need to be careful.
+        # But usually Secrets usually preserve newlines if pasted correctly.
+        # However, sometimes users paste ' ' instead of '\n'. 
+        
         with open("cookies.txt", "w") as f:
             f.write(cookie_content)
         print("Generated cookies.txt from environment variable.")
