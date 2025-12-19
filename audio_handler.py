@@ -85,17 +85,60 @@ def transcribe_audio(file_path):
     client = OpenAI(api_key=api_key)
 
     try:
-        with open(file_path, "rb") as audio_file:
+        file_size = os.path.getsize(file_path)
+        print(f"Audio file size: {file_size / (1024*1024):.2f} MB")
+        
+        # OpenAI Limit is 25MB (26214400 bytes). We use 24MB as safety threshold.
+        LIMIT_BYTES = 24 * 1024 * 1024
+        
+        final_path = file_path
+        
+        if file_size > LIMIT_BYTES:
+            print("File exceeds OpenAI 25MB limit. Compressing audio...")
+            # Use ffmpeg to compress: mono, 32k bitrate mp3
+            # This reduces size significantly while keeping speech valid
+            compressed_path = file_path + "_compressed.mp3"
+            
+            import subprocess
+            # ffmpeg -i input -map 0:a:0 -b:a 32k -ac 1 output.mp3
+            cmd = [
+                "ffmpeg", "-y", 
+                "-i", file_path, 
+                "-map", "0:a:0", 
+                "-b:a", "32k", 
+                "-ac", "1", 
+                compressed_path
+            ]
+            
+            try:
+                subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                final_path = compressed_path
+                new_size = os.path.getsize(final_path)
+                print(f"Compressed size: {new_size / (1024*1024):.2f} MB")
+                
+                if new_size > LIMIT_BYTES:
+                    print("Warning: Compressed file still > 24MB. splitting is required but not yet implemented. Proceeding (might fail)...")
+                    # Future: Implement chunking here
+            except Exception as compress_err:
+                print(f"Compression failed: {compress_err}. Trying original file.")
+                final_path = file_path
+
+        with open(final_path, "rb") as audio_file:
             transcript = client.audio.transcriptions.create(
                 model="whisper-1", 
                 file=audio_file
             )
+        
+        # Cleanup compressed if created
+        if final_path != file_path and os.path.exists(final_path):
+            os.remove(final_path)
+            
         return transcript.text
     except Exception as e:
         print(f"Error during transcription: {e}")
         return None
     finally:
-        # Cleanup
+        # Cleanup original
         try:
             if os.path.exists(file_path):
                 os.remove(file_path)
