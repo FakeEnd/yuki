@@ -14,6 +14,19 @@ BILIBILI_UID = 1515375273
 # Using /videos to ensure we get chronological uploads
 YOUTUBE_CHANNEL = "https://www.youtube.com/@SavvyCapitalist%E8%81%AA%E6%98%8E%E5%B0%8F%E8%B5%84/videos"
 
+# Helper to load cookies for Cloud Execution
+def load_cookies():
+    cookie_content = os.getenv("COOKIES_TXT")
+    if cookie_content:
+        # Create cookies.txt from secret
+        with open("cookies.txt", "w") as f:
+            f.write(cookie_content)
+        print("Generated cookies.txt from environment variable.")
+
+# Load env vars
+load_cookies()
+
+
 async def check_new_videos(uid):
     # ... (Keep existing Bilibili logic, renamed slightly for clarity or just kept as is)
     print(f"Checking Bilibili videos for user {uid}...")
@@ -122,7 +135,11 @@ def check_youtube_new_videos(channel_url):
                         # Create a new YDL instance or reuse? Reusing is fine but we need different opts if we want full info?
                         # actually existing opts are 'extract_flat': True. We need a new instance/opts for full extraction logic
                         # or just overriding.
-                         with yt_dlp.YoutubeDL({'quiet':True, 'no_warnings':True}) as ydl_full:
+                         opts_full = {'quiet':True, 'no_warnings':True}
+                         if os.path.exists('cookies.txt'):
+                             opts_full['cookiefile'] = 'cookies.txt'
+                         
+                         with yt_dlp.YoutubeDL(opts_full) as ydl_full:
                              full_info = ydl_full.extract_info(url, download=False)
                              upload_date_str = full_info.get('upload_date')
                     except Exception as e:
