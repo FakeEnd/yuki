@@ -1,5 +1,6 @@
 import asyncio
 import time
+import os
 from bilibili_api import user, sync
 from dotenv import load_dotenv
 import processor
@@ -31,7 +32,18 @@ async def check_new_videos(uid):
     # ... (Keep existing Bilibili logic, renamed slightly for clarity or just kept as is)
     print(f"Checking Bilibili videos for user {uid}...")
     try:
-        u = user.User(uid)
+        # Check for credentials in env
+        sessdata = os.getenv("BILIBILI_SESSDATA")
+        bili_jct = os.getenv("BILIBILI_JCT")
+        buvid3 = os.getenv("BILIBILI_BUVID3")
+        
+        credential = None
+        if sessdata and bili_jct and buvid3:
+            from bilibili_api import Credential
+            print("Using Bilibili Credentials from environment.")
+            credential = Credential(sessdata=sessdata, bili_jct=bili_jct, buvid3=buvid3)
+            
+        u = user.User(uid, credential=credential)
         user_info = await u.get_user_info()
         uploader_name = user_info['name']
         print(f"Bilibili Uploader: {uploader_name}")
@@ -187,3 +199,4 @@ async def main_monitor():
 if __name__ == "__main__":
     # Run the async loop
     asyncio.run(main_monitor())
+
