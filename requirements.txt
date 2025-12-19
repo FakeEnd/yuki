@@ -1,0 +1,6 @@
+youtube-transcript-api
+bilibili-api-python
+openai
+python-dotenv
+yt-dlp
+notion-client

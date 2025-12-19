@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+
+# Environment
+.env
+
+# Project specific
+audio_cache/
+output/
+# We might want to keep output if the user wants to use it for MkDocs pages hosted here, 
+# but usually for a "tool" repo we ignore it. 
+# However, if the goal is "publish", they might want the MDS.
+# For now, let's IGNORE audio cache but KEEP output unless user says otherwise, 
+# as they might want to see the examples. 
+# Actually, strict rule: ignore .env is critical.
+processed_videos.db
+*.db
+
+# OS
+.DS_Store
