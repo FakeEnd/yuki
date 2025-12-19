@@ -35,5 +35,9 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          COOKIES_TXT: ${{ secrets.COOKIES_TXT }}
+          BILIBILI_SESSDATA: ${{ secrets.BILIBILI_SESSDATA }}
+          BILIBILI_JCT: ${{ secrets.BILIBILI_JCT }}
+          BILIBILI_BUVID3: ${{ secrets.BILIBILI_BUVID3 }}
         run: |
           python monitor.py
